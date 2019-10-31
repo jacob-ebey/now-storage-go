@@ -76,43 +76,43 @@ import (
 const testFile = "testFile.txt"
 
 func main() {
-  // Get a os.Reader for the file we want to upload
-  f, err := os.Open(testFile)
+	// Get a os.Reader for the file we want to upload
+	f, err := os.Open(testFile)
 	if err != nil {
-    fmt.Println("Failed to open test file to upload.", err)
-    return
+		fmt.Println("Failed to open test file to upload.", err)
+		return
 	}
-  defer f.Close()
-  
-  // Create our storage client
-  client := storage.Client{
+	defer f.Close()
+
+	// Create our storage client
+	client := storage.Client{
 		Token:          os.Getenv("NOW_TOKEN"),
 		DeploymentName: os.Getenv("NOW_DEPLOYMENT"),
 		Team:           os.Getenv("NOW_TEAMID"),
 		Retries:        2,
-  }
-  
-  // Upload the file without creating a deployment
-  uploadedFile, err := client.UploadFile(f, testFile)
+	}
+
+	// Upload the file without creating a deployment
+	uploadedFile, err := client.UploadFile(f, testFile)
 	if err != nil {
-    fmt.Println("Failed to upload file.", err)
-    return
-  }
-  
-  // Create a deployment consisting of the uploaded file
-  deployment, err := client.CreateDeployment([]*storage.UploadedFile{uploadedFile})
+		fmt.Println("Failed to upload file.", err)
+		return
+	}
+
+	// Create a deployment consisting of the uploaded file
+	deployment, err := client.CreateDeployment([]*storage.UploadedFile{uploadedFile})
 	if err != nil {
-    fmt.Println("Failed to create deployment.", err)
-    return
-  }
-  
-  // Wait for the deployment to be ready
-  if err := client.WaitForReady(*deployment); err != nil {
-    fmt.Println("Failed to wait for deployment.", err)
-    return
-  }
-  
-  fmt.Println(deployment.Url)          // Print the base URL of the deployment
-  fmt.Println(deployment.Files[0].Url) // Print the URL of the uploaded file
+		fmt.Println("Failed to create deployment.", err)
+		return
+	}
+
+	// Wait for the deployment to be ready
+	if err := client.WaitForReady(*deployment); err != nil {
+		fmt.Println("Failed to wait for deployment.", err)
+		return
+	}
+
+	fmt.Println(deployment.Url)          // Print the base URL of the deployment
+	fmt.Println(deployment.Files[0].Url) // Print the URL of the uploaded file
 }
 ```
